@@ -1,0 +1,12 @@
+source 'https://github.com/CocoaPods/Specs.git'
+
+target 'IMOFilterStack', :exclusive => true do
+  pod "IMOFilterStack", :path => "../"
+end
+
+target 'Tests', :exclusive => true do
+  pod "IMOFilterStack", :path => "../"
+
+  pod 'Specta'
+  pod 'Expecta'
+end
