@@ -7,23 +7,26 @@
 //
 
 #import "IMOViewController.h"
+#import "IMOFilterStack+IMOCustomFilterStacks.h"
 
 @interface IMOViewController ()
 
+@property (nonatomic, weak) IBOutlet UIImageView *imageView;
+
 @end
+
 
 @implementation IMOViewController
 
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-	// Do any additional setup after loading the view, typically from a nib.
-}
 
-- (void)didReceiveMemoryWarning
-{
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
+    IMOFilterStack *stack = [IMOFilterStack redscaleRotateAndPixelateStack];
+
+    [stack processImage:[UIImage imageNamed:@"TestImage.jpg"] completion:^(UIImage *result, NSError *error) {
+        [self.imageView setImage:result];
+    }];
 }
 
 @end
