@@ -6,9 +6,9 @@
 //
 //
 
-#import "IMOFilterStackPrivate.h"
+#import "IMFSStack.h"
 
-@implementation IMOFilterStackPrivate
+@implementation IMFSStack
 
 - (instancetype)init
 {

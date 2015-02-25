@@ -7,12 +7,16 @@
 //
 
 #import "IMOFilterStack.h"
-#import "IMOFilterStackPrivate.h"
+
+#import "IMFSStack.h"
+#import "IMFSConverter.h"
 
 @interface IMOFilterStack ()
 
 @property (nonatomic, strong) NSOperationQueue *queue;
-@property (nonatomic, strong) IMOFilterStackPrivate *pImpl;
+
+@property (nonatomic, strong) IMFSStack *pImpl;
+@property (nonatomic, strong) IMFSConverter *converter;
 
 @end
 
@@ -35,8 +39,9 @@
 {
     self = [super init];
     if (self) {
-        _pImpl = [[IMOFilterStackPrivate alloc] initWithFilters:filters];
-        _queue = [NSOperationQueue new];
+        _pImpl     = [[IMFSStack alloc] initWithFilters:filters];
+        _converter = [IMFSConverter new];
+        _queue     = [NSOperationQueue new];
     }
     return self;
 }
@@ -51,47 +56,16 @@
     [self.queue addOperationWithBlock:^{
 
         // Convert and forward to private implementation.
-        CIImage *ret = [self.pImpl imageByApplyingFiltersToImage:[self CIImageFromUIImage:image]];
+        CIImage *ret = [self.pImpl imageByApplyingFiltersToImage:[self.converter CIImageFromUIImage:image]];
 
         // Render in background...
-        UIImage *result = [self UIImageFromCIImage:ret referenceImage:image];
+        UIImage *result = [self.converter UIImageFromCIImage:ret referenceImage:image];
 
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
             // Bounce result to main thread.
             completion(result, nil);
         }];
     }];
-}
-
-
-#pragma mark - Misc
-
-- (CIImage *)CIImageFromUIImage:(UIImage *)image
-{
-    CIImage *ciImage = [image CIImage];
-    if (ciImage != nil) {
-        return ciImage;
-    }
-
-    CGImageRef cgImage = [image CGImage];
-    if (cgImage != NULL) {
-        return [CIImage imageWithCGImage:cgImage];
-    }
-
-    return nil;
-}
-
-- (UIImage *)UIImageFromCIImage:(CIImage *)ciImage referenceImage:(UIImage *)refImage
-{
-    if ([refImage CGImage]) {
-        // Restore as CGImage-backed UIImage.
-        CIContext *context = [CIContext contextWithOptions:nil];
-        CGImageRef cgImage = [context createCGImage:ciImage fromRect:[ciImage extent]];
-        return [UIImage imageWithCGImage:cgImage scale:[refImage scale] orientation:[refImage imageOrientation]];
-    }
-
-    // Restore as CIImage-backed UIImage.
-    return [UIImage imageWithCIImage:ciImage scale:[refImage scale] orientation:[refImage imageOrientation]];
 }
 
 

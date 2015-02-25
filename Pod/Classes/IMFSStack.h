@@ -9,7 +9,7 @@
 #import <Foundation/Foundation.h>
 #import <CoreImage/CoreImage.h>
 
-@interface IMOFilterStackPrivate : NSObject
+@interface IMFSStack : NSObject
 
 @property (nonatomic, readonly, copy) NSArray *filters;
 

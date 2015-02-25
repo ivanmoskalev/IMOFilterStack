@@ -19,11 +19,13 @@
 
 
 #import <IMOFilterStack/IMOFilterStack.h>
-#import <IMOFilterStack/IMOFilterStackPrivate.h>
+#import <IMOFilterStack/IMFSStack.h>
+#import <IMOFilterStack/IMFSConverter.h>
 
 @interface IMOFilterStack ()
 
-@property (nonatomic, strong) IMOFilterStackPrivate *pImpl;
+@property (nonatomic, strong) IMFSStack *pImpl;
+@property (nonatomic, strong) IMFSConverter *converter;
 
 @end
 
@@ -32,14 +34,14 @@
 SpecBegin(IMOFilterStackPrivate)
 
 // Responsible for actual filter application
-describe(@"IMOFilterStackPrivate", ^{
+describe(@"IMFSStack", ^{
 
-    IMOFilterStackPrivate *__block sut = nil;
+    IMFSStack *__block sut = nil;
 
     it(@"should init with array of filters", ^{
         NSArray *filterArray = @[ [CIFilter filterWithName:@"CIStraightenFilter"],
                                   [CIFilter filterWithName:@"CILanczosScaleTransform"] ];
-        sut = [[IMOFilterStackPrivate alloc] initWithFilters:filterArray];
+        sut = [[IMFSStack alloc] initWithFilters:filterArray];
 
         expect(sut.filters).to.equal(filterArray);
     });
@@ -51,7 +53,7 @@ describe(@"IMOFilterStackPrivate", ^{
         CIImage *secondFilterImage = [CIImage new]; // after filter no. 2
 
         beforeEach(^{
-            sut = [[IMOFilterStackPrivate alloc] initWithFilters:@[ mock([CIFilter class]), mock([CIFilter class]) ]];
+            sut = [[IMFSStack alloc] initWithFilters:@[ mock([CIFilter class]), mock([CIFilter class]) ]];
 
             [given([sut.filters[0] copyWithZone:NULL]) willReturn:sut.filters[0]];
             [given([sut.filters[1] copyWithZone:NULL]) willReturn:sut.filters[1]];
@@ -99,35 +101,41 @@ describe(@"IMOFilterStack", ^{
             expect(sut.pImpl).toNot.beNil();
             expect(sut.pImpl.filters).to.equal(filterArray);
         });
+
+        it(@"should create a converter", ^{
+            expect(sut.converter).toNot.beNil();
+            expect(sut.converter).to.beKindOf([IMFSConverter class]);
+        });
     });
 
     context(@"on processImage call", ^{
 
-        UIImage *__block image = nil;
+        CIImage *ciImage     = [CIImage new];
+        CIImage *filterImage = [CIImage new];
+        UIImage *resultImage = [UIImage new];
 
         beforeEach(^{
-            image     = mock([UIImage class]);
-            sut.pImpl = mock([IMOFilterStackPrivate class]);
+            sut.pImpl     = mock([IMFSStack class]);
+            sut.converter = mock([IMFSConverter class]);
+
+            [given([sut.converter CIImageFromUIImage:HC_anything()]) willReturn:ciImage];
+            [given([sut.pImpl imageByApplyingFiltersToImage:ciImage]) willReturn:filterImage];
+            [given([sut.converter UIImageFromCIImage:filterImage referenceImage:HC_anything()]) willReturn:resultImage];
         });
 
-        it(@"if image is backed by CIImage should forward CIImage to implementor", ^{
+        it(@"should use CIImage converted by converter", ^{
             waitUntil(^(DoneCallback done) {
-                CIImage *ciImage = [CIImage new];
-                [given([image CIImage]) willReturn:ciImage];
-
-                [sut processImage:image completion:^(UIImage *result, NSError *error) {
+                [sut processImage:[UIImage new] completion:^(UIImage *result, NSError *error) {
                     [MKTVerify(sut.pImpl) imageByApplyingFiltersToImage:ciImage];
                     done();
                 }];
             });
         });
 
-        it(@"if image is backed by CGImage should convert it and forward CIImage to implementor", ^{
+        it(@"should return UIImage converted by converter", ^{
             waitUntil(^(DoneCallback done) {
-                image = [UIImage imageNamed:@"TestImage.jpg"]; // real this time
-
-                [sut processImage:image completion:^(UIImage *result, NSError *error) {
-                    [MKTVerify(sut.pImpl) imageByApplyingFiltersToImage:HC_instanceOf([CIImage class])];
+                [sut processImage:[UIImage new] completion:^(UIImage *result, NSError *error) {
+                    expect(result).to.equal(resultImage);
                     done();
                 }];
             });
