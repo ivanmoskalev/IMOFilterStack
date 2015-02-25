@@ -1,6 +1,6 @@
 # IMOFilterStack
 
-[![CI Status](http://img.shields.io/travis/Ivan Moskalev/IMOFilterStack.svg?style=flat)](https://travis-ci.org/Ivan Moskalev/IMOFilterStack)
+[![CI Status](http://img.shields.io/travis/ivanmoskalev/IMOFilterStack.svg?style=flat)](https://travis-ci.org/Ivan Moskalev/IMOFilterStack)
 [![Version](https://img.shields.io/cocoapods/v/IMOFilterStack.svg?style=flat)](http://cocoadocs.org/docsets/IMOFilterStack)
 [![License](https://img.shields.io/cocoapods/l/IMOFilterStack.svg?style=flat)](http://cocoadocs.org/docsets/IMOFilterStack)
 [![Platform](https://img.shields.io/cocoapods/p/IMOFilterStack.svg?style=flat)](http://cocoadocs.org/docsets/IMOFilterStack)
