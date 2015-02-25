@@ -31,6 +31,7 @@
 
 SpecBegin(IMOFilterStackPrivate)
 
+// Responsible for actual filter application
 describe(@"IMOFilterStackPrivate", ^{
 
     IMOFilterStackPrivate *__block sut = nil;
@@ -78,10 +79,11 @@ SpecEnd
 
 
 // TODO: Refactor conversion to additional component.
+
 // Responsible for conversion and asynchronous processing.
 SpecBegin(IMOFilterStack)
 
-xdescribe(@"IMOFilterStack", ^{
+describe(@"IMOFilterStack", ^{
 
     IMOFilterStack *__block sut = nil;
 
