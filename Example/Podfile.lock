@@ -1,11 +1,15 @@
 PODS:
   - Expecta (0.3.2)
   - IMOFilterStack (0.1.0)
+  - OCHamcrest (4.1.1)
+  - OCMockito (1.4.0):
+    - OCHamcrest (~> 4.0)
   - Specta (0.3.2)
 
 DEPENDENCIES:
   - Expecta
   - IMOFilterStack (from `../`)
+  - OCMockito
   - Specta
 
 EXTERNAL SOURCES:
@@ -15,6 +19,8 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   Expecta: ee641011fe10aa1855d487b40e4976dac50ec342
   IMOFilterStack: 7485d345a0e29f1a318fa51af04d832280b3cd33
+  OCHamcrest: af1c7c5ea345de69ea6c9c2958f65f3044e5c420
+  OCMockito: 991936bb775cc4c27f063d38f5e17b9161fbd21c
   Specta: 698a58ffa5ec948327d3b92eab50ca58d7f4fbe8
 
 COCOAPODS: 0.36.0.beta.2

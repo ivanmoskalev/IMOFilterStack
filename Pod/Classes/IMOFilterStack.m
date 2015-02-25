@@ -7,15 +7,19 @@
 //
 
 #import "IMOFilterStack.h"
+#import "IMOFilterStackPrivate.h"
 
 @interface IMOFilterStack ()
 
-@property (nonatomic, readonly, strong) NSOperationQueue *queue;
+@property (nonatomic, strong) NSOperationQueue *queue;
+@property (nonatomic, strong) IMOFilterStackPrivate *pImpl;
 
 @end
 
 
 @implementation IMOFilterStack
+
+@dynamic filters;
 
 + (instancetype)withFilters:(NSArray *)filters
 {
@@ -31,28 +35,26 @@
 {
     self = [super init];
     if (self) {
-        _filters = [filters copy];
-        _queue   = [NSOperationQueue new];
+        _pImpl = [[IMOFilterStackPrivate alloc] initWithFilters:filters];
+        _queue = [NSOperationQueue new];
     }
     return self;
+}
+
+- (NSArray *)filters
+{
+    return [self.pImpl filters];
 }
 
 - (void)processImage:(UIImage *)image completion:(void (^)(UIImage *, NSError *))completion
 {
     [self.queue addOperationWithBlock:^{
-        CIImage *ciImage = [self CIImageFromUIImage:image];
 
-        // Deep copy filters array...
-        NSArray *filters = [[NSArray alloc] initWithArray:self.filters copyItems:YES];
-
-        // Apply filters consecutively...
-        for (CIFilter *filter in filters) {
-            [filter setValue:ciImage forKey:kCIInputImageKey];
-            ciImage = [filter outputImage];
-        }
+        // Convert and forward to private implementation.
+        CIImage *ret = [self.pImpl imageByApplyingFiltersToImage:[self CIImageFromUIImage:image]];
 
         // Render in background...
-        UIImage *result = [self UIImageFromCIImage:ciImage referenceImage:image];
+        UIImage *result = [self UIImageFromCIImage:ret referenceImage:image];
 
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
             // Bounce result to main thread.

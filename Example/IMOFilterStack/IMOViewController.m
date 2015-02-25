@@ -7,7 +7,7 @@
 //
 
 #import "IMOViewController.h"
-#import "IMOFilterStack+IMOCustomFilterStacks.h"
+#import <IMOFilterStack/IMOFilterStack.h>
 
 @interface IMOViewController ()
 
@@ -22,11 +22,20 @@
 {
     [super viewDidLoad];
 
-    IMOFilterStack *stack = [IMOFilterStack redscaleRotateAndPixelateStack];
+    IMOFilterStack *stack = [self redscaleRotateAndPixelateStack];
 
     [stack processImage:[UIImage imageNamed:@"TestImage.jpg"] completion:^(UIImage *result, NSError *error) {
         [self.imageView setImage:result];
     }];
+}
+
+- (IMOFilterStack *)redscaleRotateAndPixelateStack
+{
+    return [IMOFilterStack withFilters:@[
+                                         [CIFilter filterWithName:@"CIColorMonochrome" keysAndValues:kCIInputColorKey, [CIColor colorWithRed:1. green:0. blue:0.], nil],
+                                         [CIFilter filterWithName:@"CIStraightenFilter" keysAndValues:kCIInputAngleKey, @(3 * M_PI / 180.0)],
+                                         [CIFilter filterWithName:@"CIPixellate"]
+                                         ]];
 }
 
 @end
