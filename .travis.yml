@@ -10,6 +10,6 @@ install:
   - gem install xcpretty --no-rdoc --no-ri --no-document --quiet
 
 script:
-  - set -o pipefail && xcodebuild build test -workspace Example/IMOFilterStack.xcworkspace -scheme IMOFilterStack-Example -configuration Debug -sdk iphonesimulator
+  - set -o pipefail && xcodebuild build test -workspace Example/IMOFilterStack.xcworkspace -scheme IMOFilterStack-Example -configuration Debug -sdk iphonesimulator | xcpretty -c
   - pod lib lint --quick
 
