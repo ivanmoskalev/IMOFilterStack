@@ -13,8 +13,6 @@
 
 @interface IMOFilterStack ()
 
-@property (nonatomic, strong) NSOperationQueue *queue;
-
 @property (nonatomic, strong) IMFSStack *pImpl;
 @property (nonatomic, strong) IMFSConverter *converter;
 
@@ -39,9 +37,10 @@
 {
     self = [super init];
     if (self) {
-        _pImpl     = [[IMFSStack alloc] initWithFilters:filters];
-        _converter = [IMFSConverter new];
-        _queue     = [NSOperationQueue new];
+        _pImpl         = [[IMFSStack alloc] initWithFilters:filters];
+        _converter     = [IMFSConverter new];
+        _workQueue     = [NSOperationQueue new];
+        _callbackQueue = [NSOperationQueue mainQueue];
     }
     return self;
 }
@@ -53,7 +52,7 @@
 
 - (void)processImage:(UIImage *)image completion:(void (^)(UIImage *, NSError *))completion
 {
-    [self.queue addOperationWithBlock:^{
+    [self.workQueue addOperationWithBlock:^{
 
         // Convert and forward to private implementation.
         CIImage *ret = [self.pImpl imageByApplyingFiltersToImage:[self.converter CIImageFromUIImage:image]];
@@ -61,13 +60,12 @@
         // Render in background...
         UIImage *result = [self.converter UIImageFromCIImage:ret referenceImage:image];
 
-        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-            // Bounce result to main thread.
+        [self.callbackQueue addOperationWithBlock:^{
             completion(result, nil);
         }];
+
     }];
 }
-
 
 #pragma mark - Equality
 
