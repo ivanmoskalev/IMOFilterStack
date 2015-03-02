@@ -5,8 +5,7 @@ Pod::Spec.new do |s|
   s.description      = <<-DESC
                        IMOFilterStack provides a simple way of asynchronously processing multiple images using a shared CIFilter chain.
                        DESC
-  s.homepage         = "https://github.com/<GITHUB_USERNAME>/IMOFilterStack"
-  # s.screenshots     = "www.example.com/screenshots_1", "www.example.com/screenshots_2"
+  s.homepage         = "https://github.com/ivanmoskalev/IMOFilterStack"
   s.license          = 'MIT'
   s.author           = { "Ivan Moskalev" => "moskalev-ivan@yandex.ru" }
   s.source           = { :git => "https://github.com/ivanmoskalev/IMOFilterStack.git", :tag => s.version.to_s }
