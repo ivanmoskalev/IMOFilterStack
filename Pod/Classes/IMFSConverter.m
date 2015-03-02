@@ -29,9 +29,15 @@
 {
     if ([refImage CGImage]) {
         // Restore as CGImage-backed UIImage.
+
         CIContext *context = [CIContext contextWithOptions:nil];
         CGImageRef cgImage = [context createCGImage:ciImage fromRect:[ciImage extent]];
-        return [UIImage imageWithCGImage:cgImage scale:[refImage scale] orientation:[refImage imageOrientation]];
+
+        UIImage *ret = [UIImage imageWithCGImage:cgImage scale:[refImage scale] orientation:[refImage imageOrientation]];
+
+        CGImageRelease(cgImage);
+
+        return ret;
     }
 
     // Restore as CIImage-backed UIImage.
